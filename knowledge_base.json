@@ -1,0 +1,181 @@
+[
+  {
+    "article_id": "KB-ONB-001",
+    "title": "Import employee or workspace records from CSV",
+    "intent": "Data Import & Migration",
+    "keywords": [
+      "csv import",
+      "employee records",
+      "column mapping",
+      "data import",
+      "validation errors",
+      "file format"
+    ],
+    "approved": true,
+    "version": "1.2",
+    "last_reviewed": "2026-09-15",
+    "response": "For a standard CSV import, download the current template from Workspace Settings → Data Import, keep the required column headers unchanged, and save the file as UTF-8 CSV. Use the preview step to map columns and review validation errors before confirming the import. Do not upload files containing passwords, access tokens, or unnecessary personal data. If the preview reports missing rows or invalid mappings, stop before confirming and send the import job ID and sanitized error summary to the Data Migration Team.",
+    "owner": "Data Operations"
+  },
+  {
+    "article_id": "KB-ONB-002",
+    "title": "Plan a data migration and diagnose a timed-out import",
+    "intent": "Data Import & Migration",
+    "keywords": [
+      "data migration",
+      "import timeout",
+      "missing records",
+      "migration job",
+      "large file",
+      "migration validation"
+    ],
+    "approved": true,
+    "version": "1.1",
+    "last_reviewed": "2026-09-15",
+    "response": "Do not repeatedly restart a migration job until its current state is checked. Record the migration job ID, source format, approximate record count, time of failure, and the sanitized error message. Compare source and destination record counts using the approved reconciliation report. Never include raw personal records or credentials in a support message. A timeout, missing records, duplicate writes, or a mismatch after retry must be reviewed by the Data Migration Team before another production run.",
+    "owner": "Data Operations"
+  },
+  {
+    "article_id": "KB-ONB-003",
+    "title": "Invite team members and configure a workspace",
+    "intent": "Workspace Setup",
+    "keywords": [
+      "workspace setup",
+      "invite users",
+      "team members",
+      "workspace settings",
+      "onboarding checklist",
+      "domain",
+      "invite colleagues",
+      "invite users",
+      "workspace members",
+      "colleagues",
+      "member invitation"
+    ],
+    "approved": true,
+    "version": "1.0",
+    "last_reviewed": "2026-09-20",
+    "response": "Open Workspace Settings → Members, choose Invite Member, and enter the colleague's business email address. Assign the least-privileged role needed for their work, then send the invitation. For domain-wide onboarding, verify the approved company domain and complete the workspace checklist before inviting the full team. If invitations are not arriving, confirm the address and ask the administrator to check the organization's email allow-list; do not share invitation links publicly.",
+    "owner": "Customer Onboarding"
+  },
+  {
+    "article_id": "KB-ONB-004",
+    "title": "Configure single sign-on using SAML or an identity provider",
+    "intent": "Identity & Access",
+    "keywords": [
+      "single sign on",
+      "sso",
+      "saml",
+      "identity provider",
+      "login",
+      "authentication",
+      "metadata"
+    ],
+    "approved": true,
+    "version": "1.3",
+    "last_reviewed": "2026-09-21",
+    "response": "Configure SSO only with an identity-provider administrator present. Compare the issuer/entity ID, callback URL, certificate validity, and attribute mapping against the current approved setup guide. Test with a designated non-critical account before enforcing SSO for all users, and retain the approved recovery administrator path. Do not paste signing certificates' private keys, passwords, or bearer tokens into the ticket. If production access is already blocked or multiple users are locked out, stop configuration changes and escalate to the Identity & Security Team.",
+    "owner": "Identity & Security"
+  },
+  {
+    "article_id": "KB-ONB-005",
+    "title": "Connect a third-party application or API integration",
+    "intent": "Integration Setup",
+    "keywords": [
+      "integration setup",
+      "third party app",
+      "api connection",
+      "webhook",
+      "salesforce",
+      "crm",
+      "oauth"
+    ],
+    "approved": true,
+    "version": "1.1",
+    "last_reviewed": "2026-09-22",
+    "response": "Start from Settings → Integrations and select the approved connector. Confirm the required scopes with the application owner, authorize using the organization's approved OAuth process, and run the connector's connection test. Check the documented field mapping and event permissions before enabling production sync. Never paste API secrets or refresh tokens into a ticket. If the connection test fails, provide the connector name, timestamp, request/correlation ID, and sanitized error text for the Integration Specialists.",
+    "owner": "Integrations"
+  },
+  {
+    "article_id": "KB-ONB-006",
+    "title": "Set roles and permissions using least privilege",
+    "intent": "Permissions & Security",
+    "keywords": [
+      "roles",
+      "permissions",
+      "least privilege",
+      "access control",
+      "administrator",
+      "role mapping"
+    ],
+    "approved": true,
+    "version": "1.2",
+    "last_reviewed": "2026-09-24",
+    "response": "Use the built-in role matrix and grant only the permissions required for each job. Test new role mappings with a designated test account and review the effective permissions before assigning the role broadly. Do not grant administrator access as a temporary workaround without an approved exception. Suspected unauthorized access, exposed credentials, or unexpected privilege escalation must be escalated immediately to the Identity & Security Team; do not attempt to conceal or delete audit evidence.",
+    "owner": "Identity & Security"
+  },
+  {
+    "article_id": "KB-ONB-007",
+    "title": "Complete the SaaS go-live readiness checklist",
+    "intent": "Workspace Setup",
+    "keywords": [
+      "go live",
+      "go-live checklist",
+      "implementation readiness",
+      "launch",
+      "workspace setup",
+      "customer onboarding",
+      "go-live date",
+      "what to check before go live",
+      "checked before launch",
+      "go-live readiness",
+      "launch checklist"
+    ],
+    "approved": true,
+    "version": "1.0",
+    "last_reviewed": "2026-09-25",
+    "response": "Before go-live, verify workspace ownership, identity and access settings, required integrations, data reconciliation, user training, support contacts, backup/recovery steps, and the rollback owner. Record the business owner and planned launch window. Do not proceed if a required access control, data reconciliation check, or rollback step is incomplete. Route a blocked go-live or unresolved production-impacting issue to the Implementation Specialists with the readiness checklist and sanitized evidence.",
+    "owner": "Implementation Operations"
+  },
+  {
+    "article_id": "KB-ONB-008",
+    "title": "Understand onboarding features and request product improvements",
+    "intent": "Product Guidance",
+    "keywords": [
+      "onboarding features",
+      "product guidance",
+      "documentation",
+      "feature request",
+      "product feedback",
+      "feature",
+      "progress overview",
+      "onboarding progress",
+      "checklist progress",
+      "new onboarding checklist feature",
+      "add progress view"
+    ],
+    "approved": true,
+    "version": "1.0",
+    "last_reviewed": "2026-09-25",
+    "response": "Use the onboarding checklist and in-product help panel for the current implementation steps. Product feedback should describe the workflow being attempted, the outcome expected, the current limitation, and the business impact. Feature suggestions are recorded for product review and are not treated as confirmed delivery commitments. The Product Feedback queue can request clarification if the proposal needs additional context.",
+    "owner": "Product Operations"
+  },
+  {
+    "article_id": "KB-ONB-009",
+    "title": "Respond to onboarding errors without exposing secrets",
+    "intent": "Unresolved Implementation Issue",
+    "keywords": [
+      "implementation error",
+      "not working",
+      "error message",
+      "troubleshooting",
+      "failed setup",
+      "correlation id"
+    ],
+    "approved": true,
+    "version": "1.0",
+    "last_reviewed": "2026-09-26",
+    "response": "To investigate an unresolved implementation issue, record the affected feature, the steps immediately before the failure, the timestamp and time zone, the correlation or job ID, and the exact sanitized error message. State whether one user or multiple users are affected and whether go-live is blocked. Do not include passwords, access tokens, private keys, raw customer data, or other secrets. If the issue persists after the documented steps, a specialist should review it rather than repeatedly retrying a potentially destructive operation.",
+    "owner": "Implementation Support"
+  }
+]

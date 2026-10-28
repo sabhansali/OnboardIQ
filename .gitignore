@@ -1,0 +1,10 @@
+.env
+.venv/
+venv/
+__pycache__/
+.pytest_cache/
+*.py[cod]
+onboardiq.db
+*.db-journal
+.streamlit/secrets.toml
+exports/*.csv

@@ -1,0 +1,15 @@
+request_id,customer_id,company_name,contact_email,request_text,created_at,source,expected_intent,expected_complexity,expected_priority
+ONB-1001,CUST-001,Northstar Labs,ops+northstar@example.test,How do I import employee records from a CSV template?,2026-10-28T22:10:00+05:30,CSV,Data Import & Migration,Low,P3
+ONB-1002,CUST-002,Blue Peak Analytics,it+bluepeak@example.test,Our SAML SSO setup fails and every employee is locked out of the production workspace.,2026-10-28T22:15:00+05:30,CSV,Identity & Access,High,P1
+ONB-1003,CUST-003,Cedar Finance,admin+cedar@example.test,How should I map roles so analysts cannot access administrator settings?,2026-10-28T22:16:00+05:30,CSV,Permissions & Security,Medium,P3
+ONB-1004,CUST-004,Orbit Retail,ops+orbit@example.test,How do I invite five colleagues to our new workspace?,2026-10-28T22:17:00+05:30,CSV,Workspace Setup,Low,P3
+ONB-1005,CUST-005,Meridian Health,it+meridian@example.test,Our data migration timed out and 140 records appear to be missing.,2026-10-28T22:18:00+05:30,CSV,Data Import & Migration,High,P2
+ONB-1006,CUST-006,Juniper Works,admin+juniper@example.test,Can you help connect our CRM with the approved OAuth integration?,2026-10-28T22:19:00+05:30,CSV,Integration Setup,Medium,P3
+ONB-1007,CUST-007,Atlas Manufacturing,security+atlas@example.test,We discovered an exposed API token in an onboarding log. Please investigate immediately.,2026-10-28T22:20:00+05:30,CSV,Permissions & Security,High,P1
+ONB-1008,CUST-008,Silverline Studio,product+silverline@example.test,Please add a progress overview to the onboarding checklist.,2026-10-28T22:21:00+05:30,CSV,Feature Request,Low,P4
+ONB-1009,CUST-009,Maple Services,help+maple@example.test,It is not working.,2026-10-28T22:22:00+05:30,CSV,Unresolved Implementation Issue,High,P2
+ONB-1010,CUST-010,Redwood Logistics,it+redwood@example.test,What should be checked before the SaaS go-live date?,2026-10-28T22:23:00+05:30,CSV,Workspace Setup,Low,P3
+ONB-1011,CUST-011,Willow Energy,ops+willow@example.test,Please configure a 17-stage approval process across six regions; our launch is blocked today.,2026-10-28T22:24:00+05:30,CSV,Other,High,P2
+ONB-1012,CUST-012,Example Invalid,invalid@example.test,   ,2026-10-28T22:25:00+05:30,CSV,,,
+ONB-1013,CUST-013,Missing Contact,,Please explain how to map the CRM fields.,2026-10-28T22:26:00+05:30,CSV,,,
+ONB-1005,CUST-014,Duplicate Sample,duplicate@example.test,Duplicate ID intentionally included for validation testing.,2026-10-28T22:27:00+05:30,CSV,Data Import & Migration,High,P2
