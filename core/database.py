@@ -136,6 +136,7 @@ def init_db(db_path: str | Path) -> None:
                 status TEXT NOT NULL,
                 created_at TEXT NOT NULL,
                 updated_at TEXT NOT NULL,
+                processing_seconds REAL,
                 first_response_due TEXT NOT NULL,
                 resolution_due TEXT NOT NULL,
                 first_response_at TEXT,
@@ -223,6 +224,10 @@ def init_db(db_path: str | Path) -> None:
             conn.execute("ALTER TABLE tickets ADD COLUMN sla_paused_at TEXT")
         if "sla_pause_seconds" not in ticket_columns:
             conn.execute("ALTER TABLE tickets ADD COLUMN sla_pause_seconds INTEGER NOT NULL DEFAULT 0")
+        # Existing databases are migrated in place. NULL means that a ticket predates
+        # processing-time measurement; we deliberately do not fabricate a duration.
+        if "processing_seconds" not in ticket_columns:
+            conn.execute("ALTER TABLE tickets ADD COLUMN processing_seconds REAL")
         count = conn.execute("SELECT COUNT(*) FROM users").fetchone()[0]
         if count == 0:
             with _transaction(conn):
@@ -494,6 +499,36 @@ def create_ticket_bundle(
                 "notification_ids": [row[0] for row in conn.execute("SELECT notification_id FROM notifications WHERE ticket_id=? AND status='QUEUED'", (ticket_id,)).fetchall()],
                 "route": routing["route"],
             }
+
+
+def set_ticket_processing_seconds(
+    db_path: str | Path,
+    ticket_id: str,
+    processing_seconds: float,
+) -> None:
+    """Persist the measured automated processing duration for a newly created ticket.
+
+    The value is measured with time.perf_counter() in core.workflow. This update does
+    not change the ticket's business status, updated_at timestamp, or optimistic-lock
+    version because it records a metric rather than a reviewer action.
+    """
+    import math
+
+    try:
+        duration = float(processing_seconds)
+    except (TypeError, ValueError) as exc:
+        raise ValueError("Processing duration must be a finite non-negative number.") from exc
+    if not math.isfinite(duration) or duration < 0:
+        raise ValueError("Processing duration must be a finite non-negative number.")
+
+    with _connection(db_path) as conn:
+        with _transaction(conn):
+            cursor = conn.execute(
+                "UPDATE tickets SET processing_seconds=? WHERE ticket_id=?",
+                (duration, ticket_id),
+            )
+            if cursor.rowcount != 1:
+                raise ValueError(f"Cannot record processing duration: ticket {ticket_id} was not found.")
 
 
 def _ticket_event(

@@ -542,15 +542,32 @@ def render_analytics(user: dict[str, Any]) -> None:
         ("Escalation rate", metrics["escalation_rate_pct"], f"{metrics['escalation_count']}/{metrics['valid_ticket_count']} valid tickets"),
         ("Notification success", metrics["notification_success_rate_pct"], f"{metrics['notifications_sent']}/{metrics['notification_delivery_requests']} delivery requests"),
         ("Resolved SLA compliance", metrics["sla_compliance_pct"], f"{metrics['sla_compliant_resolved']}/{metrics['resolved_with_sla']} resolved"),
-        ("Mean processing time", metrics["average_processing_seconds"], "Seconds from import timestamp to ticket creation"),
+        ("Mean processing time", metrics["average_processing_seconds"],
+         f"{metrics['processing_time_sample_count']} timed tickets; classification, retrieval, routing and ticket persistence only"),
     ]
     rows = [cards[:3], cards[3:]]
     for row in rows:
         cols = st.columns(3)
         for col, (label, value, foot) in zip(cols, row):
-            formatted = "N/A" if value is None else (f"{value:.2f}%" if isinstance(value, float) and "rate" in label.lower() or isinstance(value, float) and "accuracy" in label.lower() or isinstance(value, float) and "compliance" in label.lower() else (f"{value:.3f}" if isinstance(value, float) else str(value)))
+            if value is None:
+                formatted = "N/A"
+            elif isinstance(value, (int, float)) and any(
+                term in label.lower() for term in ("rate", "accuracy", "compliance", "success")
+            ):
+                formatted = f"{value:.2f}%"
+            elif isinstance(value, (int, float)) and "processing time" in label.lower():
+                formatted = f"{value:.4f} s"
+            elif isinstance(value, float):
+                formatted = f"{value:.3f}"
+            else:
+                formatted = str(value)
             with col: metric_card(label, formatted, foot)
         st.write("")
+    st.caption(
+        "Processing time uses time.perf_counter() from the start of per-request classification "
+        "through retrieval, routing, and ticket persistence. It excludes upload parsing, "
+        "notification delivery, and human review. Historical tickets without a stored duration are excluded."
+    )
     st.markdown("#### Classification evaluation against manually labelled sample records")
     classification_table = []
     for dim, val in metrics["classification"].items():

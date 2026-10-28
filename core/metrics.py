@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 from collections import Counter
-from datetime import datetime
+import math
 from typing import Any
 
 from sklearn.metrics import precision_recall_fscore_support
@@ -16,13 +16,18 @@ def _pct(numerator: float, denominator: float) -> float | None:
     return round(100.0 * numerator / denominator, 2) if denominator else None
 
 
-def _duration_seconds(start: str, end: str) -> float | None:
-    try:
-        a = datetime.fromisoformat(start.replace("Z", "+00:00"))
-        b = datetime.fromisoformat(end.replace("Z", "+00:00"))
-        return max(0.0, (b - a).total_seconds())
-    except (ValueError, TypeError):
+def _processing_duration(ticket: dict[str, Any]) -> float | None:
+    """Return a valid persisted duration, or None for historical/unmeasured tickets."""
+    raw = ticket.get("processing_seconds")
+    if raw is None:
         return None
+    try:
+        value = float(raw)
+    except (TypeError, ValueError):
+        return None
+    if not math.isfinite(value) or value < 0:
+        return None
+    return value
 
 
 def compute_metrics(db_path: str) -> dict[str, Any]:
@@ -43,13 +48,12 @@ def compute_metrics(db_path: str) -> dict[str, Any]:
     sent = sum(n["status"] == "SENT" for n in delivery_candidates)
     within_sla_resolved = sum(t["sla_state"] == "WITHIN_SLA" for t in resolved)
     resolution_sla_rate = _pct(within_sla_resolved, len(resolved))
-    average_processing = []
-    for ticket in tickets:
-        request = next((r for r in requests if r["request_id"] == ticket["request_id"]), None)
-        if request:
-            seconds = _duration_seconds(request["imported_at"], ticket["created_at"])
-            if seconds is not None:
-                average_processing.append(seconds)
+    # Durations are measured with time.perf_counter() in the request workflow and
+    # persisted on each ticket. Older tickets with NULL durations are excluded.
+    processing_durations = [
+        duration for ticket in tickets
+        if (duration := _processing_duration(ticket)) is not None
+    ]
     review_assigned_ids = {t["ticket_id"] for t in tickets if t["route"] in {"HUMAN_REVIEW", "SPECIALIST_HUMAN_REVIEW", "LOW_CONFIDENCE_SPECIALIST_REVIEW", "NO_APPROVED_ANSWER_ESCALATE", "URGENT_HUMAN_ESCALATION"}}
     review_assigned = len(review_assigned_ids)
     review_completed_ids = {e["ticket_id"] for e in ticket_events if e["action"] in {"APPROVE", "EDIT", "HOLD", "REQUEST_INFORMATION", "ESCALATE", "RESOLVE"} and e["ticket_id"] in review_assigned_ids}
@@ -123,7 +127,8 @@ def compute_metrics(db_path: str) -> dict[str, Any]:
         "sla_compliance_pct": resolution_sla_rate,
         "sla_compliant_resolved": within_sla_resolved,
         "resolved_with_sla": len(resolved),
-        "average_processing_seconds": round(sum(average_processing) / len(average_processing), 3) if average_processing else None,
+        "average_processing_seconds": round(sum(processing_durations) / len(processing_durations), 4) if processing_durations else None,
+        "processing_time_sample_count": len(processing_durations),
         "review_completion_rate_pct": _pct(len(review_completed_ids), review_assigned),
         "review_actions_recorded": len(review_completed_ids),
         "review_assigned": review_assigned,

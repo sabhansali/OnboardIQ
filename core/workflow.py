@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 from typing import Any
+import time
 
 from core.classifier import classify_request
 from core.database import (
@@ -10,6 +11,8 @@ from core.database import (
     get_ticket,
     finalize_import_batch,
     record_rejected_row,
+    set_ticket_processing_seconds,
+    log_audit,
 )
 from core.notifications import dispatch_notification
 from core.resolver import retrieve_article
@@ -25,6 +28,10 @@ def process_one_request(
     config: dict[str, Any],
     use_groq: bool = False,
 ) -> dict[str, Any]:
+    # Measure decisioning + ticket persistence with a monotonic high-resolution clock.
+    # This intentionally excludes file parsing/validation, notification delivery, and
+    # any time spent waiting for a human reviewer.
+    processing_started = time.perf_counter()
     classification = classify_request(request["request_text"], use_groq=use_groq)
     article, match_score, retrieval_diagnostics = retrieve_article(
         request["request_text"], knowledge_base,
@@ -43,6 +50,22 @@ def process_one_request(
         batch_id=batch_id,
         config=config,
     )
+    processing_seconds = time.perf_counter() - processing_started
+    try:
+        set_ticket_processing_seconds(db_path, result["ticket_id"], processing_seconds)
+        result["processing_seconds"] = processing_seconds
+    except Exception as exc:
+        # A metrics-write problem must not turn an already-created ticket into a false
+        # rejected import row. Leave the metric NULL and record the diagnostic event.
+        try:
+            log_audit(
+                str(db_path), "SYSTEM", "PROCESSING_TIME_PERSIST_FAILED",
+                request_id=request.get("request_id"), ticket_id=result["ticket_id"],
+                details="The ticket was created, but its measured processing duration could not be saved.",
+                error_details=f"{type(exc).__name__}: {exc}",
+            )
+        except Exception:
+            pass
     deliveries: list[dict[str, Any]] = []
     for notification_id in result["notification_ids"]:
         # Auto-dispatch is restricted to system-authorized, non-approval-gated drafts/queues.
